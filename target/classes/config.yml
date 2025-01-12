@@ -1,0 +1,15 @@
+serverCheck: "auth"
+serverConnect: "lobby
+gameMode: 2
+success: "&aПроверка успешно пройдена!"
+hours: 72
+message: "Перейдите по ссылке и решите рекапчу с устройства на котором вы играете, чтобы пройти проверку: {url}"
+site: "https://109.172.91.185:7777/v2652166.hosted-by-vdsina.ru"
+key: ""
+titleOn: true
+title: "Проверка"
+subTittle: "Перейдите по ссылке в чате и пройдите рекапчу."
+titleNo: "Проверка"
+subTittleNo: "Проверка пройдена, приятной игры!"
+serverCommands: []
+playerCommands: []
