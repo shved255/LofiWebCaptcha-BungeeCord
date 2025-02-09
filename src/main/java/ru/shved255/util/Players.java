@@ -32,9 +32,14 @@ public class Players {
     }
     
     public boolean needVerifed(ProxiedPlayer player) {
+    	try {
+			ConfigurationProvider.getProvider(YamlConfiguration.class).load(new File(plugin.getDataFolder(), fileName));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
     	UUID uuid = player.getUniqueId();
 		String id = uuid.toString();
-		if (!yml.contains(id)) {
+		if(!yml.contains(id)) {
 		    return true; 
 		}
 		int hours = plugin.config().getHours();

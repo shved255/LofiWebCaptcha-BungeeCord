@@ -29,7 +29,10 @@ public class Config {
     private int hours;
 	private List<String> commandsPlayer;
 	private List<String> commandsServer;
-    
+	private String kickPlayer;
+    private int time;
+    private Boolean serverConnectEnable;
+	
     public Config(Main plugin) {
         this.plugin = plugin;
         try {
@@ -37,20 +40,23 @@ public class Config {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-        success = cfg.getString("success");
-        proverka = cfg.getString("message");
+        success = cfg.getString("messages.success");
+        proverka = cfg.getString("messages.message");
+        kickPlayer = cfg.getString("messages.timeKick");
+	    title = cfg.getBoolean("titles.titleOn");
+	    titleUp = cfg.getString("titles.title");
+	    titleDown = cfg.getString("titles.subTittle");
+	    titleUpNo = cfg.getString("titles.titleNo");
+	    titleDownNo = cfg.getString("titles.subTittleNo");
         site = cfg.getString("site");
         key = cfg.getString("key");
 	    commandsPlayer = cfg.getStringList("playerCommands");
 	    commandsServer = cfg.getStringList("serverCommands");
-	    title = cfg.getBoolean("titleOn");
-	    titleUp = cfg.getString("title");
-	    titleDown = cfg.getString("subTittle");
-	    titleUpNo = cfg.getString("titleNo");
-	    titleDownNo = cfg.getString("subTittleNo");
 	    hours = cfg.getInt("hours");
 	    serverCheck = cfg.getString("serverCheck");
 	    serverConnect = cfg.getString("serverConnect");
+	    time = cfg.getInt("time");
+	    serverConnectEnable = cfg.getBoolean("serverConnectEnable");
     }
     
     public Configuration getConfig() {
@@ -120,5 +126,17 @@ public class Config {
 
 	public String getServerConnect() {
 		return serverConnect;
+	}
+
+	public String getKickPlayer() {
+		return ChatColor(kickPlayer);
+	}
+
+	public int getTime() {
+		return time;
+	}
+
+	public Boolean getServerConnectEnable() {
+		return serverConnectEnable;
 	}
 }

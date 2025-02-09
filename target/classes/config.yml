@@ -1,15 +1,69 @@
+# RUS: Время которое будет у игрока на прохождение проверки, в секундах
+# ENG: Time given to the player to complete the verification, in seconds
+time: 60
+
+# RUS: Сервер на котором будет идти проверка, если игрок подключится к этому серверу то начнется проверка
+# ENG: Server where the verification will take place, if the player connects to this server, the verification will start
 serverCheck: "auth"
-serverConnect: "lobby
-gameMode: 2
-success: "&aПроверка успешно пройдена!"
+
+# RUS: Сервер к которому надо будет подключать игрока после успешного прохождения проверки
+# ENG: Server to which the player will be connected after successfully passing the verification
+serverConnect: "lobby"
+
+# RUS: Включать ли подключение к серверу после проверки?
+# ENG: Enable connecting to the server after verification?
+serverConnectEnable: true
+
+# RUS: Время сколько игрок будет верефицирован в player.yml (поставьте 0 если выключить)
+# ENG: Time for how long the player will be verified in player.yml (set to 0 to disable)
 hours: 72
-message: "Перейдите по ссылке и решите рекапчу с устройства на котором вы играете, чтобы пройти проверку: {url}"
+
+# RUS: Адрес сайта где будет находится index.php
+# ENG: Website address where index.php will be located
 site: "https://109.172.91.185:7777/v2652166.hosted-by-vdsina.ru"
-key: ""
-titleOn: true
-title: "Проверка"
-subTittle: "Перейдите по ссылке в чате и пройдите рекапчу."
-titleNo: "Проверка"
-subTittleNo: "Проверка пройдена, приятной игры!"
+
+# RUS: Уникальный ключ сайта (также вводить на сайте)
+# ENG: Unique website key (also enter on the website)
+key: "123"
+
+# RUS: Команды которые будет вводить сервер после успешной проверки игрока, поставьте {PLAYER} если нужен ник игрока
+# ENG: Commands that the server will execute after the player successfully passes the verification, use {PLAYER} if the player's nickname is needed
 serverCommands: []
+
+# RUS: Команды от имени игрока
+# ENG: Commands executed as the player
 playerCommands: []
+
+messages:
+  # RUS: Сообщение которые будет писать игроку чтобы он прошел проверку, {url} - адрес сайта
+  # ENG: Message that will be sent to the player to complete the verification, {url} - website address
+  message: "Пожалуйста перейдите по ссылке решите рекапчу с устройства на котором вы играете: {url}"
+
+  # RUS: Причина кика после таймера если игрок не смог пройти проверку
+  # ENG: Reason for kicking the player after the timer if they fail to complete the verification
+  timeKick: "Вы не успели пройти проверку!"
+
+  # RUS: Сообщение если игрок успешно прошел проверку
+  # ENG: Message if the player successfully passes the verification
+  success: "&aПроверка успешно пройдена!"
+
+titles:
+  # RUS: Включить ли тайтлы?
+  # ENG: Enable titles?
+  titleOn: true
+
+  # RUS: Верх тайтла до успешной проверки игрока (при заходе), также есть поддержка цветов
+  # ENG: Top title before the player successfully passes the verification (on join), color support is available
+  title: "Проверка"
+
+  # RUS: Низ тайтла до успешной проверки игрока (при заходе), также есть поддержка цветов
+  # ENG: Subtitle before the player successfully passes the verification (on join), color support is available
+  subTittle: "Перейдите по ссылке в чате и пройдите рекапчу, ПКМ по ссылке."
+
+  # RUS: Верх тайтла после успешной проверки игрока, также есть поддержка цветов
+  # ENG: Top title after the player successfully passes the verification, color support is available
+  titleNo: "Проверка"
+
+  # RUS: Низ тайтла после успешной проверки игрока, также есть поддержка цветов
+  # ENG: Subtitle after the player successfully passes the verification, color support is available
+  subTittleNo: "Проверка пройдена, поздравляем!"

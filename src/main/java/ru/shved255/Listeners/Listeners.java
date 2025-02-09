@@ -29,6 +29,8 @@ public class Listeners implements Listener {
     private final Players p = new Players();
     private final Map<ProxiedPlayer, ScheduledTask> tasks = new ConcurrentHashMap<>();
     private final Map<ProxiedPlayer, ScheduledTask> tasksStart = new ConcurrentHashMap<>();
+    private final Map<ProxiedPlayer, Integer> timer = new ConcurrentHashMap<>();
+    private final Map<ProxiedPlayer, ScheduledTask> tasksTimer = new ConcurrentHashMap<>();
 
     @EventHandler
     public void onJoin(PostLoginEvent event) {
@@ -41,8 +43,8 @@ public class Listeners implements Listener {
         					if(player.getServer().getInfo().getName().equals(plugin.config().getServerCheck())) {
         						start(player);
         						ScheduledTask taskGet = tasks.get(player);
-        					taskGet.cancel();
-        							tasks.remove(player);
+        						taskGet.cancel();
+        						tasks.remove(player);
         					}
         				}
         			}
@@ -60,6 +62,7 @@ public class Listeners implements Listener {
             String ip = player.getAddress().getAddress().getHostAddress();
             String base64 = u.code(nick);
             if(p.needVerifed(player)) {
+            	startTask(player);
                 if(!on.contains(nick)) {
                     on.add(nick);
                 }
@@ -85,42 +88,20 @@ public class Listeners implements Listener {
 								e.printStackTrace();
 							}
                             if(isDataFound != null && get[0] != null && get[0] && isDataFound) {
-                                Boolean b = null;
+                                Boolean Get = null;
 								try {
-									b = l.Get(plugin.config().getSite() + "/remove.php?id=" + nick + "/" + ip + "&file=verified_ips.txt&secret=" + key);
+									Get = l.Get(plugin.config().getSite() + "/remove.php?id=" + nick + "/" + ip + "&file=verified_ips.txt&secret=" + key);
 								} catch (Exception e) {
 									e.printStackTrace();
 								}
-                                if(b) {
+                                if(Get) {
                                     on.remove(nick);
                                     no.add(nick);
                                 }
                             }
                             if(no.contains(nick)) {
                                 no.remove(nick);
-                                player.sendMessage(plugin.config().getSuccess());
-                                ScheduledTask taskM = tasksStart.get(player);
-                                tasksStart.remove(player);
-                                p.setVerifed(player);
-                                if(plugin.config().getServerConnect() != null) {
-                                	if(!(player.getServer().getInfo().getName() == plugin.config().getServerConnect())) {
-                                		u.connectPlayer(player, plugin.config().getServerConnect());
-                                	}
-                                }
-                                plugin.getServer().getScheduler().schedule(plugin, () -> {
-                                    List<String> commandsPlayer = plugin.config().getCommandsPlayer();
-                                    List<String> commandsServer = plugin.config().getCommandsServer(player);
-                                    for(String command : commandsPlayer) {
-                                        plugin.getServer().getPluginManager().dispatchCommand((CommandSender) player, command);
-                                    }
-                                    for(String command : commandsServer) {
-                                        plugin.getServer().getPluginManager().dispatchCommand((CommandSender) plugin.getServer().getConsole(), command);
-                                    }
-                                }, 1, TimeUnit.SECONDS);
-                                if(plugin.config().getTitle()) {
-                                    u.sendTitle(player, plugin.config().getTitleUpNo(), plugin.config().getTitleDownNo());
-                                }
-                                taskM.cancel();
+                                onSuccess(player);
                             }
                         }
                     }, 1, 1, TimeUnit.SECONDS);
@@ -133,11 +114,10 @@ public class Listeners implements Listener {
     @EventHandler
     public void onLeave(PlayerDisconnectEvent event) {
         ProxiedPlayer player = event.getPlayer();
-        String nick = player.getName();
-        on.remove(nick);
-        no.remove(nick);
+        onKick(player);
     }
     
+    @EventHandler
     public void onChat(ChatEvent event) {   
         if(event.getSender() instanceof ProxiedPlayer) {
         	ProxiedPlayer player = (ProxiedPlayer) event.getSender();
@@ -146,5 +126,84 @@ public class Listeners implements Listener {
         	}
         }
     }
+    
+    public void startTask(ProxiedPlayer player) {
+    	int[] time = {1};
+    	time[0] = plugin.config().getTime();
+    	timer.put(player, time[0]);
+		int[] a = {1};
+		a[0] = 0;
+    	ScheduledTask taskMain = plugin.getServer().getScheduler().schedule(plugin, () -> {
+    		ScheduledTask task = tasksTimer.get(player);
+    		if(time[0] <= 0) {
+    			onKick(player);
+    			player.disconnect(plugin.config().getKickPlayer());
+    		}
+    		time[0]--;
+    		timer.put(player, time[0]);
+    		if(task != null && a[0]>=1) {
+    			if(!player.isConnected()) {
+    				task.cancel();
+    				onKick(player);
+    			}
+    		}
+    		if(!on.contains(player.getName()) && a[0]>=1) {
+    			task.cancel();
+    		}
+    		a[0]++;
+    	}, 1, 1, TimeUnit.SECONDS);
+    	tasksTimer.put(player, taskMain);
+    }
 
+    public void onKick(ProxiedPlayer player) {
+        String nick = player.getName();
+        String ip = player.getAddress().getAddress().getHostAddress();
+        String key = plugin.config().getKey();
+    	l.Get(plugin.config().getSite() + "/remove.php?id=" + nick + "/" + ip + "&file=need_verif.txt&secret=" + key);
+		if(timer.containsKey(player)) {
+			timer.remove(player);	
+		}
+		if(on.contains(player.getName())) {
+			on.remove(player.getName());
+		}
+		if(no.contains(player.getName())) {
+			no.remove(player.getName());
+		}
+		if(tasks.containsKey(player)) {
+			tasks.remove(player);
+		}
+		if(tasksStart.containsKey(player)) {
+			tasksStart.remove(player);
+		}
+		if(tasksTimer.containsKey(player)) {
+			tasksTimer.remove(player);
+		}
+    }
+    
+    public void onSuccess(ProxiedPlayer player) {
+        player.sendMessage(plugin.config().getSuccess());
+        ScheduledTask taskM = tasksStart.get(player);
+        tasksStart.remove(player);
+        p.setVerifed(player);
+        if(plugin.config().getServerConnect() != null) {
+        	if(!(player.getServer().getInfo().getName() == plugin.config().getServerConnect()) && plugin.config().getServerConnectEnable()) {
+        		u.connectPlayer(player, plugin.config().getServerConnect());
+        	}
+        }
+        plugin.getServer().getScheduler().schedule(plugin, () -> {
+            List<String> commandsPlayer = plugin.config().getCommandsPlayer();
+            List<String> commandsServer = plugin.config().getCommandsServer(player);
+            for(String command : commandsPlayer) {
+                plugin.getServer().getPluginManager().dispatchCommand((CommandSender) player, command);
+            }
+            for(String command : commandsServer) {
+                plugin.getServer().getPluginManager().dispatchCommand((CommandSender) plugin.getServer().getConsole(), command);
+            }
+        }, 1, TimeUnit.SECONDS);
+        if(plugin.config().getTitle()) {
+            u.sendTitle(player, plugin.config().getTitleUpNo(), plugin.config().getTitleDownNo());
+        }
+        taskM.cancel();
+    }
+    
 }
